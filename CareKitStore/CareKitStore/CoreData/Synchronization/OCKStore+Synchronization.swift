@@ -65,7 +65,7 @@ extension NSManagedObjectContext {
         knowledgeVector.clock(for: clockID)
     }
 
-    func performAndWait<T>(_ work: () throws -> T) throws -> T {
+    func performAndWaitResult<T>(_ work: () throws -> T) throws -> T {
         var result = Result<T, Error>.failure(OCKStoreError.invalidValue(reason: "timeout"))
         performAndWait {
             result = Result(catching: work)
@@ -257,7 +257,7 @@ extension OCKStore: OCKRemoteSynchronizationDelegate {
 
         var entitiesGroupedByKnowledge: [OCKRevisionRecord.KnowledgeVector: [OCKEntity]] = [:]
 
-        try context.performAndWait {
+        try context.performAndWaitResult {
 
             for entity in supportedTypes {
 
@@ -303,7 +303,7 @@ extension OCKStore: OCKRemoteSynchronizationDelegate {
 
     /// - Note: Thread Safe
     private func findNextConflict() throws -> [OCKEntity]? {
-        try context.performAndWait { () throws -> [OCKEntity]? in
+        try context.performAndWaitResult { () throws -> [OCKEntity]? in
 
             for entity in supportedTypes.map({ $0.entity() }) {
 
